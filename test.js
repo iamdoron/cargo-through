@@ -1,1 +1,125 @@
+"use strict"
 
+const Readable = require('stream').Readable;
+const cargoThrough = require('./');
+const Code = require('code');
+const Lab = require('lab');
+const lab = exports.lab = Lab.script();
+const expect = Code.expect;
+
+lab.experiment('Cargo Through', function () {
+  lab.test("should run on all stream inputs with cargo max of 1", function (done) {
+    const stream = createStreamWithArrayOfObjects([1,2,3,4,5,6,7,8,9,10]);
+    const actualInputs = [];
+    const cargos = [];
+    cargoThrough(stream, 1, (inputs, doneCargo) => {
+      actualInputs.push.apply(actualInputs, inputs);
+      cargos.push(inputs);
+      process.nextTick(() => {
+        doneCargo();
+      })
+    }, (err) => {
+      if (err) {
+        return done(err);
+      }
+      expect(actualInputs).to.deep.equal([1,2,3,4,5,6,7,8,9,10]);
+      expect(cargos.length).to.equal(10);
+      expect(cargos).to.deep.equal([1,2,3,4,5,6,7,8,9,10].map((value) => [value]));
+      done();
+    });
+  });
+
+  lab.test("should run on all stream inputs with cargo max of 3", function (done) {
+    const stream = createStreamWithArrayOfObjects([1,2,3,4,5,6,7,8,9,10]);
+    const actualInputs = [];
+    const cargos = [];
+    cargoThrough(stream, 3, (inputs, doneCargo) => {
+      actualInputs.push.apply(actualInputs, inputs);
+      cargos.push(inputs);
+      process.nextTick(() => {
+        doneCargo();
+      })
+    }, (err) => {
+      if (err) {
+        return done(err);
+      }
+      expect(actualInputs).to.deep.equal([1,2,3,4,5,6,7,8,9,10]);
+      expect(cargos.length).to.equal(4);
+      expect(cargos).to.deep.equal([[1,2,3], [4,5,6], [7,8,9], [10]]);
+      done();
+    });
+  });
+
+  lab.test("should run on an empty stream", function (done) {
+    const stream = createStreamWithArrayOfObjects([]);
+    const actualInputs = [];
+    const cargos = [];
+    cargoThrough(stream, 20, (inputs, doneCargo) => {
+      actualInputs.push.apply(actualInputs, inputs);
+      cargos.push(inputs);
+      doneCargo();
+    }, (err) => {
+      if (err) {
+        return done(err);
+      }
+      expect(actualInputs).to.deep.equal([]);
+      expect(cargos.length).to.equal(0);
+      done();
+    });
+  });
+
+  lab.test("should return error when stream emits error", function (done) {
+    const stream = createStreamWithArrayOfObjects([1,2,3,4,5,6,7,8,9,10]);
+    const actualInputs = [];
+    const cargos = [];
+    cargoThrough(stream, 3, (inputs, doneCargo) => {
+      actualInputs.push.apply(actualInputs, inputs);
+      cargos.push(inputs);
+      process.nextTick(() => {
+        doneCargo();
+        if (inputs[0] === 1) {
+          stream.emit("error", new Error("the error"))
+        }
+      })
+    }, (err) => {
+      expect(err).to.exist();
+      expect(err.message).to.equal("the error")
+      done();
+    });
+  });
+
+  lab.test("should return errors when there are errors with cargos", function (done) {
+    const stream = createStreamWithArrayOfObjects([1,2,3,4,5,6,7,8,9,10]);
+    const actualInputs = [];
+    const cargos = [];
+    cargoThrough(stream, 3, (inputs, doneCargo) => {
+      actualInputs.push.apply(actualInputs, inputs);
+      cargos.push(inputs);
+      process.nextTick(() => {
+        doneCargo(new Error(inputs + ": " + "error."));
+      })
+    }, (err) => {
+      expect(err).to.exist();
+      expect(err.errors).to.deep.equal([
+         new Error([1,2,3] + ": " + "error."),
+         new Error([4,5,6] + ": " + "error."),
+         new Error([7,8,9] + ": " + "error."),
+         new Error([10] + ": " + "error.")
+      ])
+      done();
+    });
+  });
+});
+
+function createStreamWithArrayOfObjects(objects) {
+  var stream = new Readable({ objectMode: true });
+
+  stream._read = () => {
+    objects.forEach((obj) => {
+      stream.push(obj);
+    });
+    stream.push(null)
+  };
+
+  return stream;
+}
