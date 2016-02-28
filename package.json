@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/iamdoron/cargo-through#readme",
   "devDependencies": {
+    "babel-eslint": "^5.0.0",
     "lab": "^10.0.0"
   }
 }
