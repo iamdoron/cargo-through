@@ -1,0 +1,26 @@
+{
+  "name": "cargo-through",
+  "version": "0.1.0",
+  "description": "Async.cargo for streams",
+  "main": "index.js",
+  "scripts": {
+    "test": "lab test.js -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamdoron/cargo-through.git"
+  },
+  "keywords": [
+    "stream",
+    "cargo"
+  ],
+  "author": "Doron Pagot",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iamdoron/cargo-through/issues"
+  },
+  "homepage": "https://github.com/iamdoron/cargo-through#readme",
+  "devDependencies": {
+    "lab": "^10.0.0"
+  }
+}
