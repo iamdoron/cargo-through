@@ -3,7 +3,7 @@ const Async = require('async');
 
 module.exports = function cargoThrough(stream, maxPayload, func, callback) {
   let cargo = Async.cargo(func, maxPayload);
-  let emittedError = null;
+  let emittedErrors = [];
   let errors = new Set();
   stream.on('data', (data) => {
     cargo.push(data, (err) => {
@@ -21,12 +21,9 @@ module.exports = function cargoThrough(stream, maxPayload, func, callback) {
       }
     }
     function end() {
-      if (emittedError) {
-        return;
-      }
       if (errors.size > 0) {
         const errorsArr = Array.from(errors);
-        const error = new Error(errorsArr);
+        const error = new Error(errorsArr.map((err) => err.stack).join('\n'));
         error.errors = errorsArr
         return callback(error)
       }
@@ -34,7 +31,6 @@ module.exports = function cargoThrough(stream, maxPayload, func, callback) {
     }
   });
   stream.on('error', (err) => {
-    emittedError = err;
-    callback(err);
+    errors.add(err);
   });
 }

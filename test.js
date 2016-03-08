@@ -78,12 +78,16 @@ lab.experiment('Cargo Through', function () {
       process.nextTick(() => {
         doneCargo();
         if (inputs[0] === 1) {
-          stream.emit("error", new Error("the error"))
+          stream.emit("error", new Error("the error1"))
+          stream.emit("error", new Error("the error2"))
         }
       })
     }, (err) => {
       expect(err).to.exist();
-      expect(err.message).to.equal("the error")
+      expect(err.message).to.contain("the error1")
+      expect(err.message).to.contain("the error2")
+      expect(err.message).to.contain("test.js")
+      console.log(err.message);
       done();
     });
   });
