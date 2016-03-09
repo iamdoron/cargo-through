@@ -87,11 +87,64 @@ lab.experiment('Cargo Through', function () {
       expect(err.message).to.contain("the error1")
       expect(err.message).to.contain("the error2")
       expect(err.message).to.contain("test.js")
-      console.log(err.message);
+
       done();
     });
   });
 
+  lab.test("should return error when stream emits error with close event", function (done) {
+    const stream = createStreamWithArrayOfObjects([1,2,3,4,5,6,7,8,9,10], {dontEnd: true});
+    const actualInputs = [];
+    const cargos = [];
+    cargoThrough(stream, 3, (inputs, doneCargo) => {
+      actualInputs.push.apply(actualInputs, inputs);
+      cargos.push(inputs);
+      process.nextTick(() => {
+        doneCargo();
+        if (inputs[0] === 1) {
+          stream.emit("error", new Error("the error1"))
+          stream.emit("error", new Error("the error2"))
+          process.nextTick(() => {
+            stream.emit('close');
+          })
+        }
+
+      })
+    }, (err) => {
+      expect(err).to.exist();
+      expect(err.message).to.contain("the error1")
+      expect(err.message).to.contain("the error2")
+      expect(err.message).to.contain("test.js")
+      done();
+    });
+  });
+
+  lab.test("should return error when stream emits error with end evend followed by a close event", function (done) {
+    const stream = createStreamWithArrayOfObjects([1,2,3,4,5,6,7,8,9,10]);
+    const actualInputs = [];
+    const cargos = [];
+    cargoThrough(stream, 3, (inputs, doneCargo) => {
+      actualInputs.push.apply(actualInputs, inputs);
+      cargos.push(inputs);
+      process.nextTick(() => {
+        doneCargo();
+        if (inputs[0] === 1) {
+          stream.emit("error", new Error("the error1"))
+          stream.emit("error", new Error("the error2"))
+          process.nextTick(() => {
+            stream.emit('close');
+          })
+        }
+
+      })
+    }, (err) => {
+      expect(err).to.exist();
+      expect(err.message).to.contain("the error1")
+      expect(err.message).to.contain("the error2")
+      expect(err.message).to.contain("test.js")
+      done();
+    });
+  });
   lab.test("should return errors when there are errors with cargos", function (done) {
     const stream = createStreamWithArrayOfObjects([1,2,3,4,5,6,7,8,9,10]);
     const actualInputs = [];
@@ -115,14 +168,23 @@ lab.experiment('Cargo Through', function () {
   });
 });
 
-function createStreamWithArrayOfObjects(objects) {
+function createStreamWithArrayOfObjects(objects, options) {
+  options = options || {};
+  let closed = false;
   var stream = new Readable({ objectMode: true });
 
   stream._read = () => {
+    if (closed) {
+      return
+    }
     objects.forEach((obj) => {
       stream.push(obj);
     });
-    stream.push(null)
+    if (!options.dontEnd) {
+      stream.push(null)
+    } else {
+      closed = true;
+    }
   };
 
   return stream;
