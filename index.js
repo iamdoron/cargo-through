@@ -1,5 +1,6 @@
 "use strict"
 const Async = require('async');
+const Util = require('util');
 
 module.exports = function cargoThrough(stream, maxPayload, func, callback) {
   let cargo = Async.cargo(func, maxPayload);
@@ -30,7 +31,7 @@ module.exports = function cargoThrough(stream, maxPayload, func, callback) {
   function end() {
     if (errors.size > 0) {
       const errorsArr = Array.from(errors);
-      const error = new Error(errorsArr.map((err) => err.stack).join('\n'));
+      const error = new Error(errorsArr.map((err) => err.stack || Util.inspect(err)).join('\n'));
       error.errors = errorsArr
       return callback(error)
     }

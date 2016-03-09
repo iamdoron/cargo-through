@@ -92,6 +92,34 @@ lab.experiment('Cargo Through', function () {
     });
   });
 
+  lab.test("should return error when stream emits error with no stack", function (done) {
+    const stream = createStreamWithArrayOfObjects([1,2,3,4,5,6,7,8,9,10]);
+    const actualInputs = [];
+    const cargos = [];
+    cargoThrough(stream, 3, (inputs, doneCargo) => {
+      actualInputs.push.apply(actualInputs, inputs);
+      cargos.push(inputs);
+      process.nextTick(() => {
+        doneCargo();
+        if (inputs[0] === 1) {
+          const e1 = new Error("the error1");
+          const e2 = new Error("the error2");
+          delete e1.stack
+          delete e2.stack
+          e1.customKey = "custom error value"
+          stream.emit("error", e1)
+          stream.emit("error", e2)
+        }
+      })
+    }, (err) => {
+      expect(err).to.exist();
+      expect(err.message).to.contain("the error1")
+      expect(err.message).to.contain("the error2")
+      expect(err.message).to.contain("customKey: 'custom error value'")
+
+      done();
+    });
+  });
   lab.test("should return error when stream emits error with close event", function (done) {
     const stream = createStreamWithArrayOfObjects([1,2,3,4,5,6,7,8,9,10], {dontEnd: true});
     const actualInputs = [];
