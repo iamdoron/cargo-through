@@ -5,7 +5,7 @@ CargoThrough(stream, maxNumberOfCargoInputs, cargoWorkerFunction, callback);
 ```
 `cargoWorkerFunction` is called sequencialy on each cargo. The cargo consists of all available inputs that were emitted by the stream while working on the previous cargo, capped by maxNumberOfCargoInputs.
 
-[![Build Status](https://secure.travis-ci.org/iamdoron/cargo-through.png)](http://travis-ci.org/iamdoron/cargo-through)
+[![Build Status](https://secure.travis-ci.org/iamdoron/cargo-through.svg)](http://travis-ci.org/iamdoron/cargo-through)
 
 # Example
 
