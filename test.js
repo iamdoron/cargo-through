@@ -22,9 +22,9 @@ lab.experiment('Cargo Through', function () {
       if (err) {
         return done(err);
       }
-      expect(actualInputs).to.deep.equal([1,2,3,4,5,6,7,8,9,10]);
+      expect(actualInputs).to.equal([1,2,3,4,5,6,7,8,9,10]);
       expect(cargos.length).to.equal(10);
-      expect(cargos).to.deep.equal([1,2,3,4,5,6,7,8,9,10].map((value) => [value]));
+      expect(cargos).to.equal([1,2,3,4,5,6,7,8,9,10].map((value) => [value]));
       done();
     });
   });
@@ -43,9 +43,9 @@ lab.experiment('Cargo Through', function () {
       if (err) {
         return done(err);
       }
-      expect(actualInputs).to.deep.equal([1,2,3,4,5,6,7,8,9,10]);
+      expect(actualInputs).to.equal([1,2,3,4,5,6,7,8,9,10]);
       expect(cargos.length).to.equal(4);
-      expect(cargos).to.deep.equal([[1,2,3], [4,5,6], [7,8,9], [10]]);
+      expect(cargos).to.equal([[1,2,3], [4,5,6], [7,8,9], [10]]);
       done();
     });
   });
@@ -62,7 +62,7 @@ lab.experiment('Cargo Through', function () {
       if (err) {
         return done(err);
       }
-      expect(actualInputs).to.deep.equal([]);
+      expect(actualInputs).to.equal([]);
       expect(cargos.length).to.equal(0);
       done();
     });
@@ -245,11 +245,11 @@ lab.experiment('Cargo Through', function () {
       })
     }, (err) => {
       expect(err).to.exist();
-      expect(err.errors).to.deep.equal([
-         new Error([1,2,3] + ": " + "error."),
-         new Error([4,5,6] + ": " + "error."),
-         new Error([7,8,9] + ": " + "error."),
-         new Error([10] + ": " + "error.")
+      expect(err.errors.map(err => err.message)).to.equal([
+         [1,2,3] + ": " + "error.",
+         [4,5,6] + ": " + "error.",
+         [7,8,9] + ": " + "error.",
+         [10] + ": " + "error."
       ])
       done();
     });
