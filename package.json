@@ -4,7 +4,7 @@
   "description": "Async.cargo for object streams",
   "main": "index.js",
   "scripts": {
-    "test": "lab test.js -c"
+    "test": "lab"
   },
   "repository": {
     "type": "git",

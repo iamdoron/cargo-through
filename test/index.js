@@ -1,7 +1,7 @@
 "use strict"
 
 const Readable = require('stream').Readable;
-const cargoThrough = require('./');
+const cargoThrough = require('../');
 const Code = require('code');
 const Lab = require('lab');
 const lab = exports.lab = Lab.script();
@@ -86,7 +86,7 @@ lab.experiment('Cargo Through', function () {
       expect(err).to.exist();
       expect(err.message).to.contain("the error1")
       expect(err.message).to.contain("the error2")
-      expect(err.message).to.contain("test.js")
+      expect(err.message).to.contain("test/index.js")
 
       done();
     });
@@ -142,7 +142,7 @@ lab.experiment('Cargo Through', function () {
       expect(err).to.exist();
       expect(err.message).to.contain("the error1")
       expect(err.message).to.contain("the error2")
-      expect(err.message).to.contain("test.js")
+      expect(err.message).to.contain("test/index.js")
       done();
     });
   });
@@ -169,7 +169,7 @@ lab.experiment('Cargo Through', function () {
       expect(err).to.exist();
       expect(err.message).to.contain("the error1")
       expect(err.message).to.contain("the error2")
-      expect(err.message).to.contain("test.js")
+      expect(err.message).to.contain("test/index.js")
       done();
     });
   });
@@ -202,7 +202,7 @@ lab.experiment('Cargo Through', function () {
       expect(err).to.exist();
       expect(err.message).to.contain("the error1")
       expect(err.message).to.contain("the error2")
-      expect(err.message).to.contain("test.js")
+      expect(err.message).to.contain("test/index.js")
       done();
     });
   });
@@ -229,7 +229,7 @@ lab.experiment('Cargo Through', function () {
       expect(err).to.exist();
       expect(err.message).to.contain("the error1")
       expect(err.message).to.contain("the error2")
-      expect(err.message).to.contain("test.js")
+      expect(err.message).to.contain("test/index.js")
       done();
     });
   });
