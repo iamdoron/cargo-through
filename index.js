@@ -13,7 +13,12 @@ module.exports = function cargoThrough(stream, maxPayload, func, callback) {
         errors.add(err);
       }
     });
-  }).on('end', () => {
+  })
+  .on('end', endAfterDrain)
+  .on('close', endAfterDrain)
+  .on('finish', endAfterDrain);
+
+  function endAfterDrain() {
     if (cargo.idle()) {
       end();
     } else {
@@ -22,7 +27,7 @@ module.exports = function cargoThrough(stream, maxPayload, func, callback) {
         end();
       }
     }
-  }).on('close', end).on('finish', end);
+  }
 
   function end() {
     if (streamHasEnded) {
