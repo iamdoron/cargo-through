@@ -12,11 +12,24 @@ module.exports = function cargoThrough(stream, maxPayload, func, callback) {
       if (err) {
         errors.add(err);
       }
+      resumeIfNeeded()
     });
+    pauseIfNeeded();
   })
   .on('end', endAfterDrain)
   .on('close', endAfterDrain)
   .on('finish', endAfterDrain);
+
+  function pauseIfNeeded() {
+    if (cargo.length() > maxPayload * 2) {
+      stream.pause();
+    }
+  }
+  function resumeIfNeeded() {
+    if (cargo.length() <= maxPayload * 2) {
+      stream.resume();
+    }
+  }
 
   function endAfterDrain() {
     if (cargo.idle()) {

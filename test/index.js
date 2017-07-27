@@ -50,6 +50,27 @@ lab.experiment('Cargo Through', function () {
     });
   });
 
+  lab.test("should run on all stream inputs with cargo max of 100 but with only a single object", function (done) {
+    const stream = createStreamWithArrayOfObjects([1]);
+    const actualInputs = [];
+    const cargos = [];
+    cargoThrough(stream, 1, (inputs, doneCargo) => {
+      actualInputs.push.apply(actualInputs, inputs);
+      cargos.push(inputs);
+      process.nextTick(() => {
+        doneCargo();
+      })
+    }, (err) => {
+      if (err) {
+        return done(err);
+      }
+      expect(actualInputs).to.equal([1]);
+      expect(cargos.length).to.equal(1);
+      expect(cargos).to.equal([[1]]);
+      done();
+    });
+  });
+
   lab.test("should run on an empty stream", function (done) {
     const stream = createStreamWithArrayOfObjects([]);
     const actualInputs = [];
